@@ -1,0 +1,285 @@
+:root {
+  --primary-color: #4a6fa5;
+  --secondary-color: #166088;
+  --accent-color: #17a2b8;
+  --success-color: #28a745;
+  --warning-color: #ffc107;
+  --danger-color: #dc3545;
+}
+
+body {
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f8f9fa;
+  padding-top: 20px;
+}
+
+.header {
+  margin-bottom: 30px;
+}
+
+.tab-content {
+  background-color: white;
+  border-radius: 0 0 8px 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  padding: 25px;
+  border: 1px solid #dee2e6;
+  border-top: none;
+  min-height: 500px;
+}
+
+.nav-tabs .nav-link {
+  font-weight: 500;
+  color: #6c757d;
+  border: 1px solid transparent;
+}
+
+.nav-tabs .nav-link.active {
+  color: var(--primary-color);
+  border-color: #dee2e6 #dee2e6 #fff;
+  font-weight: 600;
+}
+
+.btn-primary {
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
+}
+
+.btn-primary:hover {
+  background-color: var(--secondary-color);
+  border-color: var(--secondary-color);
+}
+
+.data-header {
+  background-color: #f1f8ff;
+  padding: 15px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  border-left: 5px solid var(--primary-color);
+}
+
+/* Fix table styling */
+.table {
+  color: #212529 !important;
+  margin-bottom: 0;
+}
+
+.table th {
+  background-color: #f8f9fa;
+  color: #212529 !important;
+  font-weight: 600;
+  border-bottom: 2px solid #dee2e6;
+}
+
+.table td {
+  color: #212529 !important;
+  vertical-align: middle;
+  border-color: #e9ecef;
+}
+
+.table-hover tbody tr:hover {
+  background-color: rgba(0, 0, 0, 0.04);
+}
+
+.table-hover tbody tr:hover td {
+  color: #212529 !important;
+}
+
+/* Action buttons */
+.action-buttons .btn {
+  padding: 4px 8px;
+  margin: 0 2px;
+  font-size: 0.875rem;
+}
+
+.action-buttons .btn-outline-primary {
+  color: #0d6efd !important;
+  border-color: #0d6efd !important;
+}
+
+.action-buttons .btn-outline-primary:hover {
+  color: #fff !important;
+  background-color: #0d6efd !important;
+}
+
+.action-buttons .btn-outline-danger {
+  color: #dc3545 !important;
+  border-color: #dc3545 !important;
+}
+
+.action-buttons .btn-outline-danger:hover {
+  color: #fff !important;
+  background-color: #dc3545 !important;
+}
+
+/* Disabled state */
+.btn:disabled,
+.btn.disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.view-only .btn-primary:not([data-bs-toggle="tab"]),
+.view-only .btn-outline-primary,
+.view-only .btn-outline-danger {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+/* Authentication section */
+#authSection {
+  background-color: #e8f4fc;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 20px;
+  border-left: 5px solid var(--primary-color);
+}
+
+#authSection.authenticated {
+  background-color: #e8f7e8;
+  border-left-color: var(--success-color);
+}
+
+/* Google Sign-In button styling */
+#googleSignInButton {
+  min-width: 250px;
+}
+
+.g_id_signin {
+  width: 100% !important;
+}
+
+/* Loading spinner */
+.loading-spinner {
+  text-align: center;
+  padding: 40px;
+  background-color: rgba(255, 255, 255, 0.9);
+  border-radius: 8px;
+  margin: 20px 0;
+}
+
+/* Patient cards in search results */
+.patient-card {
+  border-left: 4px solid var(--accent-color);
+  margin-bottom: 15px;
+  transition: all 0.3s;
+}
+
+.patient-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+}
+
+/* Modal styling */
+.modal-header {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+.modal-header .btn-close {
+  filter: invert(1) grayscale(100%) brightness(200%);
+}
+
+/* Footer */
+footer {
+  margin-top: 30px;
+  padding: 20px 0;
+  border-top: 1px solid #dee2e6;
+  color: #6c757d;
+  font-size: 0.9rem;
+}
+
+/* Status Badge Styling */
+.status-badge {
+  font-size: 0.75rem;
+  padding: 4px 10px;
+  border-radius: 20px;
+}
+
+.status-served {
+  background-color: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+
+.status-not-served {
+  background-color: #fff3cd;
+  color: #856404;
+  border: 1px solid #ffeaa7;
+}
+
+/* Service Filter Buttons */
+.btn-check:checked + .btn-outline-success {
+  background-color: #28a745;
+  color: white;
+}
+
+.btn-check:checked + .btn-outline-warning {
+  background-color: #ffc107;
+  color: #212529;
+}
+
+/* Today Highlight */
+.today-highlight {
+  background-color: #fff3cd !important;
+  border-left: 4px solid #ffc107 !important;
+}
+
+/* Action buttons in service table */
+.service-action-btn {
+  padding: 2px 8px;
+  margin: 0 2px;
+  font-size: 0.8rem;
+}
+
+/* Summary Cards */
+.card-header i {
+  font-size: 1.2rem;
+}
+
+/* Patient list in cards */
+.patient-list-item {
+  padding: 5px 0;
+  border-bottom: 1px solid #f0f0f0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.patient-list-item:last-child {
+  border-bottom: none;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .tab-content {
+    padding: 15px;
+  }
+
+  .data-header {
+    padding: 12px;
+  }
+
+  .table-responsive {
+    font-size: 0.875rem;
+  }
+
+  .action-buttons .btn {
+    padding: 3px 6px;
+    margin: 0 1px;
+  }
+
+  #googleSignInButton {
+    min-width: 200px;
+  }
+
+  .btn-group .btn {
+    font-size: 0.8rem;
+    padding: 5px 8px;
+  }
+
+  .service-action-btn {
+    display: block;
+    width: 100%;
+    margin: 2px 0;
+  }
+}
