@@ -6,7 +6,7 @@ let filteredServiceData = [];
 
 // Initialize application
 document.addEventListener("DOMContentLoaded", function () {
-  //   console.log("App initializing...");
+  // console.log("🚀 App initializing...");
 
   // Set tanggal default
   const today = new Date().toISOString().split("T")[0];
@@ -19,13 +19,26 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Setup event listeners
   setupEventListeners();
-
-  // Setup event listeners untuk tab baru
   setupServiceTabListeners();
-
   setupGlobalSearch();
+  setupTabSwitchListeners();
 
-  //   console.log("App initialized");
+  // LOAD DATA AWAL
+  // console.log("📥 Loading initial data...");
+  setTimeout(() => {
+    loadPatientsData().then(() => {
+      // console.log("✅ Initial data loaded");
+
+      // Cek apakah tab layanan aktif saat pertama load
+      const activeTab = document.querySelector(".nav-tabs .nav-link.active");
+      if (activeTab && activeTab.id === "layanan-tab") {
+        // console.log("📋 Tab layanan aktif, loading service data...");
+        loadServiceStatusData();
+      }
+    });
+  }, 1500); // Beri waktu untuk Google API load
+
+  // console.log("🎯 App initialized");
 });
 
 // FUNGSI BARU: Setup listeners untuk tab Status Layanan
@@ -60,22 +73,122 @@ function setupServiceTabListeners() {
     });
 }
 
-// FUNGSI BARU: Load data untuk tab Status Layanan
+// FUNGSI BARU: Load data untuk tab Status Layanan (DIPERBAIKI)
 function loadServiceStatusData() {
   if (!patientsData || patientsData.length === 0) {
-    // console.log("No patient data available");
+    console.log("No patient data available for service status");
+    const tableBody = document.getElementById("serviceStatusTableBody");
+    if (tableBody) {
+      tableBody.innerHTML = `
+                <tr>
+                    <td colspan="8" class="text-center text-muted py-4">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        Data pasien belum dimuat.
+                    </td>
+                </tr>
+            `;
+    }
     return;
   }
 
-  const today = new Date().toISOString().split("T")[0];
+  // Format: YYYY-MM-DD
+  const today = new Date();
+  const todayStr = today.toISOString().split("T")[0]; // 2025-12-26
+  const todayDay = today.getDate();
+  const todayMonth = today.getMonth() + 1;
+  const todayYear = today.getFullYear();
 
-  // Filter pasien hari ini
+  // Format alternatif untuk matching
+  const todayDDMMYYYY = `${String(todayDay).padStart(2, "0")}/${String(
+    todayMonth
+  ).padStart(2, "0")}/${todayYear}`; // 26/12/2025
+  const todayDDMMYY = `${String(todayDay).padStart(2, "0")}/${String(
+    todayMonth
+  ).padStart(2, "0")}/${String(todayYear).slice(-2)}`; // 26/12/25
+
+  // // DEBUG: Tampilkan format yang dicari
+  // console.log("Mencari tanggal:", {
+  //   "YYYY-MM-DD": todayStr,
+  //   "DD/MM/YYYY": todayDDMMYYYY,
+  //   "DD/MM/YY": todayDDMMYY,
+  // });
+
+  // Filter pasien hari ini - PERBAIKAN UTAMA
   todayPatientsData = patientsData.filter((patient) => {
-    const patientDate = patient[1] ? patient[1].split("T")[0] : "";
-    return patientDate === today;
-  });
+    if (!patient || patient.length < 2) return false;
 
-  //   console.log(`Today's patients: ${todayPatientsData.length}`);
+    const patientDate = patient[1]; // Kolom tanggal
+
+    if (!patientDate || patientDate.trim() === "") return false;
+
+    // Bersihkan string tanggal
+    const cleanDate = patientDate.toString().trim();
+
+    // Cek berbagai format tanggal
+
+    // Format 1: DD/MM/YY (18/12/25)
+    if (cleanDate.includes("/")) {
+      const parts = cleanDate.split("/");
+      if (parts.length === 3) {
+        const day = parseInt(parts[0]);
+        const month = parseInt(parts[1]);
+        let year = parseInt(parts[2]);
+
+        // Convert 2-digit year to 4-digit
+        if (year < 100) {
+          year += 2000; // Asumsi tahun 2000+
+        }
+
+        // Compare with today
+        return day === todayDay && month === todayMonth && year === todayYear;
+      }
+    }
+
+    // Format 2: DD/MM/YYYY (18/12/2025)
+    if (cleanDate.includes("/")) {
+      const parts = cleanDate.split("/");
+      if (parts.length === 3) {
+        const day = parseInt(parts[0]);
+        const month = parseInt(parts[1]);
+        const year = parseInt(parts[2]);
+
+        return day === todayDay && month === todayMonth && year === todayYear;
+      }
+    }
+
+    // Format 3: YYYY-MM-DD (2025-12-18)
+    if (cleanDate.includes("-")) {
+      const datePart = cleanDate.split("T")[0];
+      const parts = datePart.split("-");
+      if (parts.length === 3) {
+        const year = parseInt(parts[0]);
+        const month = parseInt(parts[1]);
+        const day = parseInt(parts[2]);
+
+        return day === todayDay && month === todayMonth && year === todayYear;
+      }
+    }
+
+    // Format 4: Timestamp atau Date object
+    try {
+      const dateObj = new Date(cleanDate);
+      if (!isNaN(dateObj.getTime())) {
+        const patientDay = dateObj.getDate();
+        const patientMonth = dateObj.getMonth() + 1;
+        const patientYear = dateObj.getFullYear();
+
+        return (
+          patientDay === todayDay &&
+          patientMonth === todayMonth &&
+          patientYear === todayYear
+        );
+      }
+    } catch (e) {
+      // Skip error
+    }
+
+    return false;
+  });
 
   // Update counters
   updateServiceCounters();
@@ -89,19 +202,38 @@ function loadServiceStatusData() {
 
 // FUNGSI BARU: Update counter di tab Status Layanan
 function updateServiceCounters() {
-  if (!todayPatientsData.length) {
+  // console.log("🔢 Updating service counters...");
+  // console.log("📈 Total pasien hari ini:", todayPatientsData.length);
+
+  if (!todayPatientsData || todayPatientsData.length === 0) {
+    // console.log("📭 No patients today, resetting counters");
     document.getElementById("totalToday").textContent = "0";
     document.getElementById("servedCount").textContent = "0";
     document.getElementById("notServedCount").textContent = "0";
     return;
   }
 
-  const servedCount = todayPatientsData.filter((patient) => {
-    const therapy = patient[7] || "";
-    return therapy.trim().length > 0;
-  }).length;
+  let servedCount = 0;
+  let notServedCount = 0;
 
-  const notServedCount = todayPatientsData.length - servedCount;
+  todayPatientsData.forEach((patient, index) => {
+    const therapy = patient[7] || ""; // Kolom terapi (index 7)
+    const hasTherapy = therapy.toString().trim().length > 0;
+
+    if (hasTherapy) {
+      servedCount++;
+      // console.log(
+      //   `✅ Pasien ${index + 1}: "${
+      //     patient[2]
+      //   }" - Sudah dilayani (terapi: "${therapy}")`
+      // );
+    } else {
+      notServedCount++;
+      // console.log(`⏳ Pasien ${index + 1}: "${patient[2]}" - Belum dilayani`);
+    }
+  });
+
+  // console.log(`📊 Hasil: ${servedCount} dilayani, ${notServedCount} belum`);
 
   document.getElementById("totalToday").textContent = todayPatientsData.length;
   document.getElementById("servedCount").textContent = servedCount;
@@ -471,6 +603,7 @@ function updateSummaryLists() {
   }
 
   // Update not served patients list
+  // Update not served patients list
   const notServedList = document.getElementById("notServedPatientsList");
   if (notServedPatients.length > 0) {
     let notServedHtml = "";
@@ -562,28 +695,107 @@ function formatTimeFromDate(dateString) {
   }
 }
 
-// FUNGSI BARU: Format date untuk display
-function formatDateForDisplay(dateString) {
-  if (!dateString) return "-";
+// FUNGSI BARU: Konversi tanggal dari format spreadsheet ke YYYY-MM-DD
+function convertSpreadsheetDate(spreadsheetDate) {
+  if (!spreadsheetDate || spreadsheetDate.trim() === "") return "";
+
+  const dateStr = spreadsheetDate.toString().trim();
 
   try {
-    const date = new Date(dateString);
-    if (isNaN(date.getTime())) {
-      return dateString;
+    // Format DD/MM/YY atau DD/MM/YYYY
+    if (dateStr.includes("/")) {
+      const parts = dateStr.split("/");
+      if (parts.length === 3) {
+        let day = parseInt(parts[0]);
+        let month = parseInt(parts[1]);
+        let year = parseInt(parts[2]);
+
+        // Convert 2-digit year to 4-digit
+        if (year < 100) {
+          year += 2000;
+        }
+
+        // Format to YYYY-MM-DD
+        return `${year}-${String(month).padStart(2, "0")}-${String(
+          day
+        ).padStart(2, "0")}`;
+      }
     }
-    return date.toLocaleDateString("id-ID", {
+
+    // Format YYYY-MM-DD (sudah benar)
+    if (dateStr.includes("-")) {
+      return dateStr.split("T")[0];
+    }
+
+    // Try parsing as Date object
+    const dateObj = new Date(dateStr);
+    if (!isNaN(dateObj.getTime())) {
+      return dateObj.toISOString().split("T")[0];
+    }
+
+    return dateStr; // Return as is if can't parse
+  } catch (error) {
+    console.log("Error converting date:", dateStr, error);
+    return dateStr;
+  }
+}
+
+// FUNGSI BARU: Format tanggal untuk display
+function formatDateForDisplay(spreadsheetDate) {
+  const convertedDate = convertSpreadsheetDate(spreadsheetDate);
+
+  if (!convertedDate) return "-";
+
+  try {
+    const dateObj = new Date(convertedDate);
+    if (isNaN(dateObj.getTime())) return convertedDate;
+
+    return dateObj.toLocaleDateString("id-ID", {
       weekday: "long",
       year: "numeric",
       month: "long",
       day: "numeric",
     });
   } catch (e) {
-    return dateString;
+    return convertedDate;
   }
+}
+
+// FUNGSI BARU: Format tanggal untuk input date (YYYY-MM-DD)
+function formatDateForInput(spreadsheetDate) {
+  return convertSpreadsheetDate(spreadsheetDate);
 }
 
 function checkAuthStatus() {
   return auth.isAuthenticated;
+}
+
+// FUNGSI BARU: Setup listeners untuk tab switching
+function setupTabSwitchListeners() {
+  const tabLinks = document.querySelectorAll(
+    '#myTab button[data-bs-toggle="tab"]'
+  );
+
+  tabLinks.forEach((tab) => {
+    tab.addEventListener("shown.bs.tab", function (event) {
+      const targetId = event.target.getAttribute("data-bs-target");
+      // console.log(`🔀 Tab switched to: ${targetId}`);
+
+      // Jika switch ke tab layanan, refresh data
+      if (targetId === "#status-layanan") {
+        // console.log("🔄 Refreshing service status data...");
+        setTimeout(() => {
+          loadServiceStatusData();
+        }, 300);
+      }
+
+      // Jika switch ke tab semua pasien, refresh jika perlu
+      if (targetId === "#data-pasien") {
+        // console.log("🔄 Tab semua pasien aktif");
+        // Data sudah di-load, tidak perlu refresh
+      }
+    });
+  });
 }
 
 // Setup event listeners
@@ -750,25 +962,17 @@ function clearGlobalSearch() {
   document.getElementById("totalPatients").textContent = patientsData.length;
 }
 
-// // Panggil setupGlobalSearch di DOMContentLoaded
-// document.addEventListener("DOMContentLoaded", function () {
-//   // ... kode lainnya ...
-//   setupGlobalSearch();
-// });
-
-// Load patients data
+// Tambahkan kode debugging sederhana di app.js
 async function loadPatientsData() {
   try {
     showLoading(true);
 
-    // console.log("Loading patients data...");
     const data = await sheetsAPI.getData("A2:I");
     patientsData = data;
 
-    // console.log("Patients data loaded:", patientsData.length, "rows");
     displayPatientsTable(patientsData);
 
-    // 🔄 UPDATE BARU: Refresh tab Status Layanan jika aktif
+    // Refresh tab Status Layanan jika aktif
     const activeTab = document.querySelector(".nav-tabs .nav-link.active");
     if (activeTab && activeTab.id === "layanan-tab") {
       loadServiceStatusData();
@@ -808,7 +1012,7 @@ function displayPatientsTable(data) {
     const tableRow = document.createElement("tr");
     tableRow.innerHTML = `
             <td>${escapeHtml(row[0] || "")}</td>
-            <td>${formatDate(row[1])}</td>
+          <td>${formatDateForDisplay(row[1])}</td>
             <td><strong>${escapeHtml(row[2] || "")}</strong></td>
             <td>${escapeHtml(row[3] || "")}</td>
             <td>${escapeHtml(row[4] || "")}</td>
@@ -857,15 +1061,14 @@ function displayPatientsTable(data) {
 // Save new patient
 async function saveNewPatient() {
   try {
-    // Validate form
     if (!validatePatientForm("add")) {
-      alert("Harap isi semua kolom yang wajib diisi!");
+      showMessage("Harap isi semua kolom wajib", "warning");
       return;
     }
 
     const patientData = [
       document.getElementById("addRegNumber").value.trim(),
-      document.getElementById("addDate").value,
+      document.getElementById("addDate").value, // Format: YYYY-MM-DD
       document.getElementById("addFullName").value.trim(),
       document.getElementById("addParent").value.trim(),
       document.getElementById("addAddress").value.trim(),
@@ -875,11 +1078,13 @@ async function saveNewPatient() {
       document.getElementById("addNotes").value.trim(),
     ];
 
+    // console.log("➕ Menambahkan data baru:", patientData);
+
     showLoading(true);
 
     await sheetsAPI.appendData(patientData);
 
-    // Close modal
+    // Tutup modal
     const modal = bootstrap.Modal.getInstance(
       document.getElementById("addPatientModal")
     );
@@ -891,19 +1096,38 @@ async function saveNewPatient() {
       .toISOString()
       .split("T")[0];
 
-    // Reload data
-    await loadPatientsData();
+    // console.log("🔄 Memuat ulang data...");
+
+    // MUAT ULANG DATA DENGAN CARA YANG BENAR
+    await loadPatientsData(); // Ini akan refresh semua data
+
+    // TUNGGU SEBENTAR lalu refresh tab layanan
+    setTimeout(() => {
+      const activeTab = document.querySelector(".nav-tabs .nav-link.active");
+      // console.log("📍 Tab aktif:", activeTab?.id);
+
+      if (
+        activeTab &&
+        (activeTab.id === "layanan-tab" || activeTab.id === "data-tab")
+      ) {
+        // console.log("🔄 Refresh tab aktif");
+        if (activeTab.id === "layanan-tab") {
+          loadServiceStatusData();
+        }
+        // Tab data-tab sudah di-refresh oleh loadPatientsData()
+      }
+    }, 1000);
 
     showMessage("Data pasien berhasil ditambahkan!", "success");
   } catch (error) {
-    console.error("Error adding patient:", error);
+    console.error("❌ Error adding patient:", error);
     showMessage("Gagal menambah data: " + error.message, "error");
   } finally {
     showLoading(false);
   }
 }
 
-// Edit patient
+// FUNGSI: Edit patient (DIPERBAIKI)
 function editPatient(index) {
   const patient = patientsData[index];
 
@@ -917,7 +1141,11 @@ function editPatient(index) {
 
   document.getElementById("editRowIndex").value = rowIndex;
   document.getElementById("editRegNumber").value = patient[0] || "";
-  document.getElementById("editDate").value = patient[1] || "";
+
+  // KONVERSI TANGGAL DARI SPREADSHEET KE FORMAT INPUT
+  document.getElementById("editDate").value =
+    formatDateForInput(patient[1]) || "";
+
   document.getElementById("editFullName").value = patient[2] || "";
   document.getElementById("editParent").value = patient[3] || "";
   document.getElementById("editAddress").value = patient[4] || "";
@@ -1173,21 +1401,7 @@ function validatePatientForm(formType) {
 }
 
 function formatDate(dateString) {
-  if (!dateString) return "-";
-
-  try {
-    const date = new Date(dateString);
-    if (isNaN(date.getTime())) {
-      return dateString;
-    }
-    return date.toLocaleDateString("id-ID", {
-      day: "2-digit",
-      month: "2-digit",
-      year: "numeric",
-    });
-  } catch (e) {
-    return dateString;
-  }
+  return formatDateForDisplay(dateString);
 }
 
 function escapeHtml(text) {
