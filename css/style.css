@@ -249,8 +249,226 @@ footer {
   border-bottom: none;
 }
 
+/* Custom month selector styling */
+#customMonth {
+  width: 160px;
+  display: inline-block;
+  font-size: 0.9rem;
+}
+
+/* Dashboard Styles */
+.dashboard-container {
+  min-height: 600px;
+}
+
+/* Active state untuk period buttons */
+.btn-outline-primary.active {
+  background-color: #4a6fa5;
+  color: white;
+  border-color: #4a6fa5;
+}
+
+/* Dashboard header improvements */
+.dashboard-header {
+  background-color: #f8f9fa;
+  padding: 15px 20px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  border-left: 5px solid var(--primary-color);
+}
+
+.dashboard-header h4 {
+  margin: 0;
+  color: var(--primary-color);
+  font-size: 1.25rem;
+}
+
+.dashboard-card {
+  background: white;
+  border-radius: 10px;
+  padding: 20px;
+  margin-bottom: 25px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  border: 1px solid #e9ecef;
+}
+
+.dashboard-card h4 {
+  color: var(--primary-color);
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #f0f0f0;
+}
+
+/* Stat Cards */
+.stat-card {
+  color: white;
+  padding: 20px;
+  border-radius: 8px;
+  text-align: center;
+  transition: transform 0.3s;
+}
+
+.stat-card:hover {
+  transform: translateY(-5px);
+}
+
+.stat-card i {
+  font-size: 2.5rem;
+  margin-bottom: 10px;
+  opacity: 0.9;
+}
+
+.stat-card h3 {
+  font-size: 2.2rem;
+  font-weight: 700;
+  margin: 10px 0;
+}
+
+.stat-card p {
+  font-size: 0.9rem;
+  opacity: 0.9;
+  margin: 0;
+}
+
+/* Charts */
+.chart-container {
+  background: white;
+  padding: 15px;
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
+  margin-bottom: 20px;
+}
+
+.chart-title {
+  text-align: center;
+  font-weight: 600;
+  color: #495057;
+  margin-top: 10px;
+  font-size: 0.9rem;
+}
+
+/* Summary Lists */
+.monthly-summary,
+.demographic-card {
+  background: #f8f9fa;
+  padding: 15px;
+  border-radius: 8px;
+  height: 100%;
+}
+
+.monthly-summary h5,
+.demographic-card h5 {
+  color: var(--primary-color);
+  margin-bottom: 15px;
+  font-size: 1rem;
+}
+
+.monthly-summary ul,
+.demographic-card ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.monthly-summary li,
+.demographic-card li {
+  padding: 8px 0;
+  border-bottom: 1px solid #e9ecef;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.monthly-summary li:last-child,
+.demographic-card li:last-child {
+  border-bottom: none;
+}
+
+/* Table in Dashboard */
+.dashboard-card .table {
+  font-size: 0.9rem;
+}
+
+.dashboard-card .table th {
+  background-color: #f1f8ff;
+  border-top: none;
+}
+
+/* Age statistics styling */
+.age-stat-item {
+  padding: 8px 0;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.age-stat-item:last-child {
+  border-bottom: none;
+}
+
+.age-category-card {
+  padding: 10px;
+  border-radius: 6px;
+  margin-bottom: 10px;
+  border-left: 4px solid #ccc;
+}
+
+.age-category-card.bayi {
+  border-left-color: #17a2b8;
+}
+.age-category-card.balita {
+  border-left-color: #007bff;
+}
+.age-category-card.anak {
+  border-left-color: #28a745;
+}
+.age-category-card.remaja {
+  border-left-color: #ffc107;
+}
+.age-category-card.dewasa-muda {
+  border-left-color: #6c757d;
+}
+.age-category-card.dewasa {
+  border-left-color: #343a40;
+}
+.age-category-card.lansia {
+  border-left-color: #dc3545;
+}
+
+/* Progress bars for age distribution */
+.age-progress {
+  height: 20px;
+  border-radius: 10px;
+  overflow: hidden;
+  background-color: #e9ecef;
+}
+
+.age-progress-bar {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
 /* Responsive adjustments */
 @media (max-width: 768px) {
+  .stat-card {
+    margin-bottom: 15px;
+  }
+
+  .stat-card h3 {
+    font-size: 1.8rem;
+  }
+
+  .dashboard-card {
+    padding: 15px;
+  }
+
+  .btn-group .btn {
+    font-size: 0.8rem;
+    padding: 5px 10px;
+  }
   .tab-content {
     padding: 15px;
   }

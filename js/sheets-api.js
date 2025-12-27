@@ -32,14 +32,8 @@ class SheetsAPI {
   }
 
   // Get data dengan authenticated request
-  // Di sheets-api.js, dalam fungsi getDataAuthenticated():
   async getDataAuthenticated(range) {
     const url = `${this.API_BASE}/${this.SPREADSHEET_ID}/values/${this.SHEET_NAME}!${range}`;
-    // console.log("🔐 Fetching AUTHENTICATED data from:", url);
-    // console.log(
-    //   "📝 Using access token (first 20 chars):",
-    //   this.accessToken ? this.accessToken.substring(0, 20) + "..." : "No token"
-    // );
 
     try {
       const response = await fetch(url, {
@@ -49,23 +43,39 @@ class SheetsAPI {
         },
       });
 
-      //   console.log("📊 Response status:", response.status, response.statusText);
+      // Handle token expired
+      if (response.status === 401) {
+        // console.log("Token expired during API call (401)");
+
+        // Notify auth module
+        if (typeof auth !== "undefined") {
+          auth.handleTokenExpired();
+        }
+
+        throw new Error("Token expired. Silakan login kembali.");
+      }
 
       if (!response.ok) {
         const errorText = await response.text();
-        console.error("❌ API Error Response:", errorText);
+        console.error("API Error:", errorText);
         throw new Error(`API error: ${response.status} ${response.statusText}`);
       }
 
       const data = await response.json();
-      //   console.log(
-      //     "✅ Data received:",
-      //     data.values ? data.values.length : 0,
-      //     "rows"
-      //   );
       return data.values || [];
     } catch (error) {
-      console.error("❌ Fetch error:", error);
+      console.error("Fetch error:", error);
+
+      // Jika error karena token, clear session
+      if (
+        error.message.includes("Token expired") ||
+        error.message.includes("401")
+      ) {
+        if (typeof auth !== "undefined") {
+          auth.clearExpiredSession();
+        }
+      }
+
       throw error;
     }
   }

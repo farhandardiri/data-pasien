@@ -1066,6 +1066,11 @@ async function saveNewPatient() {
       return;
     }
 
+    // CEK TOKEN sebelum operasi
+    if (!(await auth.checkTokenBeforeOperation())) {
+      return; // Akan dihandle oleh auth module
+    }
+
     const patientData = [
       document.getElementById("addRegNumber").value.trim(),
       document.getElementById("addDate").value, // Format: YYYY-MM-DD
@@ -1120,6 +1125,10 @@ async function saveNewPatient() {
 
     showMessage("Data pasien berhasil ditambahkan!", "success");
   } catch (error) {
+    if (error.message.includes("Token expired")) {
+      // Sudah dihandle oleh auth module
+      return;
+    }
     console.error("❌ Error adding patient:", error);
     showMessage("Gagal menambah data: " + error.message, "error");
   } finally {
@@ -1376,6 +1385,34 @@ function displaySearchResults(results, searchTerm) {
     });
   });
 }
+
+// Fungsi untuk membersihkan data usia sebelum disimpan
+function cleanAgeInput(ageStr) {
+  if (!ageStr) return "";
+
+  const str = ageStr.toString().trim();
+
+  // Jika hanya angka, tambah "tahun"
+  if (/^\d+$/.test(str)) {
+    const num = parseInt(str);
+    return num < 13 ? `${num} bulan` : `${num} tahun`;
+  }
+
+  // Standardize format
+  return str
+    .replace(/thn/gi, "tahun")
+    .replace(/bln/gi, "bulan")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+// Gunakan di form input
+document.getElementById("addAge")?.addEventListener("blur", function () {
+  const cleaned = cleanAgeInput(this.value);
+  if (cleaned !== this.value) {
+    this.value = cleaned;
+  }
+});
 
 // Helper functions
 function validatePatientForm(formType) {
