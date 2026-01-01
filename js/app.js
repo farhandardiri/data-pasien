@@ -904,16 +904,89 @@ function performGlobalSearch() {
     .toLowerCase();
   const filterToday =
     document.getElementById("filterTodayOnly")?.checked || false;
-  const today = new Date().toISOString().split("T")[0];
+  // const today = new Date().toISOString().split("T")[0];
+  // console.log("🔍 Performing global search...", filterToday);
 
   let filteredData = patientsData;
 
   // Filter by date if needed
+  // Filter by date if needed - DIPERBAIKI
   if (filterToday) {
+    const today = new Date();
+    const todayYear = today.getFullYear();
+    const todayMonth = today.getMonth() + 1;
+    const todayDay = today.getDate();
+
+    // console.log(
+    //   `📅 Filter: Mencari pasien tanggal ${todayDay}/${todayMonth}/${todayYear}`
+    // );
+
     filteredData = patientsData.filter((patient) => {
-      const patientDate = patient[1] ? patient[1].split("T")[0] : "";
-      return patientDate === today;
+      const patientDateStr = patient[1] ? patient[1].toString().trim() : "";
+
+      if (!patientDateStr) {
+        // console.log(
+        //   `  ❌ Data ${patient[0]} - ${patient[2]}: tidak ada tanggal`
+        // );
+        return false;
+      }
+
+      // console.log(`  ⏳ Cek: "${patientDateStr}" untuk ${patient[2]}`);
+
+      // Parse tanggal dari berbagai format
+      let patientDay, patientMonth, patientYear;
+
+      // Format: DD/MM/YY (01/01/26)
+      if (patientDateStr.includes("/")) {
+        const parts = patientDateStr.split("/");
+        if (parts.length === 3) {
+          patientDay = parseInt(parts[0]);
+          patientMonth = parseInt(parts[1]);
+          let year = parseInt(parts[2]);
+
+          // Convert 2-digit year to 4-digit
+          if (year < 100) {
+            year += 2000;
+          }
+          patientYear = year;
+        }
+      }
+      // Format: YYYY-MM-DD (2026-01-01)
+      else if (patientDateStr.includes("-")) {
+        const datePart = patientDateStr.split("T")[0];
+        const parts = datePart.split("-");
+        if (parts.length === 3) {
+          patientYear = parseInt(parts[0]);
+          patientMonth = parseInt(parts[1]);
+          patientDay = parseInt(parts[2]);
+        }
+      }
+
+      // Bandingkan dengan hari ini
+      if (patientDay && patientMonth && patientYear) {
+        const isMatch =
+          patientDay === todayDay &&
+          patientMonth === todayMonth &&
+          patientYear === todayYear;
+
+        // if (isMatch) {
+        //   console.log(
+        //     `    ✅ COCOK! ${patientDay}/${patientMonth}/${patientYear}`
+        //   );
+        // } else {
+        //   console.log(
+        //     `    ❌ TIDAK COCOK: ${patientDay}/${patientMonth}/${patientYear}`
+        //   );
+        // }
+
+        return isMatch;
+      }
+
+      // console.log(`    ❌ GAGAL PARSE: "${patientDateStr}"`);
+      return false;
     });
+
+    // console.log(`🎯 Hasil filter: ${filteredData.length} pasien ditemukan`);
   }
 
   // Filter by search term
