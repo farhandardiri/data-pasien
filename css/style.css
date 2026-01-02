@@ -451,6 +451,47 @@ footer {
   font-weight: 600;
 }
 
+/* Tambahkan di CSS */
+/* Style untuk dropdown autocomplete */
+datalist {
+  position: absolute;
+  background-color: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 1000;
+}
+
+datalist option {
+  padding: 8px 12px;
+  cursor: pointer;
+  border-bottom: 1px solid #eee;
+}
+
+datalist option:hover {
+  background-color: #f8f9fa;
+}
+
+/* Style untuk form */
+.patient-suggestion-info {
+  font-size: 0.85em;
+  color: #6c757d;
+  margin-top: 2px;
+}
+
+/* Tooltip untuk info pasien */
+.patient-tooltip {
+  position: absolute;
+  background: #fff;
+  border: 1px solid #ddd;
+  padding: 8px;
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  z-index: 1050;
+  max-width: 300px;
+}
+
 /* Responsive adjustments */
 @media (max-width: 768px) {
   .stat-card {

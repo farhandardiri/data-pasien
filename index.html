@@ -456,7 +456,7 @@
 
               <div class="row">
                 <div class="col-md-6 mb-3">
-                  <label for="addFullName" class="form-label"
+                  <!-- <label for="addFullName" class="form-label"
                     >Nama Lengkap *</label
                   >
                   <input
@@ -464,8 +464,30 @@
                     class="form-control"
                     id="addFullName"
                     required
+                  /> -->
+                  <label for="addFullName" class="form-label">
+                    <i class="fas fa-user me-1"></i>Nama Lengkap Pasien
+                    <span class="text-danger">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="addFullName"
+                    list="patientSuggestions"
+                    autocomplete="off"
+                    placeholder="Ketik nama atau pilih dari daftar pasien lama..."
+                    required
                   />
+                  <datalist id="patientSuggestions"></datalist>
+                  <div class="form-text">
+                    <small
+                      >Ketik minimal 2 karakter untuk melihat saran. Jika pasien
+                      baru, isi manual.</small
+                    >
+                  </div>
                 </div>
+                <input type="hidden" id="isExistingPatient" value="false" />
+                <input type="hidden" id="selectedPatientData" value="" />
                 <div class="col-md-6 mb-3">
                   <label for="addParent" class="form-label"
                     >Wali/Orang Tua</label
